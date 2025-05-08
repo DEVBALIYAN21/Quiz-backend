@@ -1,0 +1,68 @@
+[
+  {
+    "id": "692a350e-5660-418d-8476-0ba3f0907c87",
+    "userId": "a9275633-ce03-47a6-a1e4-efc659f90bed",
+    "quizId": "1",
+    "answers": [
+      {
+        "questionId": "1",
+        "answer": 2
+      },
+      {
+        "questionId": "2",
+        "answer": 1
+      },
+      {
+        "questionId": "3",
+        "answer": 1
+      }
+    ],
+    "score": 10,
+    "startTime": "2025-05-07T22:43:59.4390131+05:30",
+    "endTime": "2025-05-07T22:44:39.255276+05:30"
+  },
+  {
+    "id": "155e46df-207e-40a4-ad40-9fb72449bc7d",
+    "userId": "7402db66-5748-4f72-8b2c-21d5046b599f",
+    "quizId": "1",
+    "answers": [
+      {
+        "questionId": "1",
+        "answer": 0
+      },
+      {
+        "questionId": "2",
+        "answer": 0
+      },
+      {
+        "questionId": "3",
+        "answer": 0
+      }
+    ],
+    "score": 0,
+    "startTime": "2025-05-07T23:46:48.7698839+05:30",
+    "endTime": "2025-05-07T23:46:57.65258+05:30"
+  },
+  {
+    "id": "157c0467-3103-4d57-a370-0c0f84c03688",
+    "userId": "7402db66-5748-4f72-8b2c-21d5046b599f",
+    "quizId": "1",
+    "answers": [
+      {
+        "questionId": "1",
+        "answer": 2
+      },
+      {
+        "questionId": "2",
+        "answer": 0
+      },
+      {
+        "questionId": "3",
+        "answer": 1
+      }
+    ],
+    "score": 7,
+    "startTime": "2025-05-07T23:51:12.427616+05:30",
+    "endTime": "2025-05-07T23:51:34.5813869+05:30"
+  }
+]

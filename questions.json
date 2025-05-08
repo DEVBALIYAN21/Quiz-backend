@@ -1,0 +1,41 @@
+[
+  {
+    "id": "1",
+    "text": "What is the capital of France?",
+    "options": [
+      "London",
+      "Berlin",
+      "Paris",
+      "Madrid"
+    ],
+    "answer": 2,
+    "category": "Geography",
+    "points": 5
+  },
+  {
+    "id": "2",
+    "text": "Who wrote 'Romeo and Juliet'?",
+    "options": [
+      "Charles Dickens",
+      "William Shakespeare",
+      "Jane Austen",
+      "Mark Twain"
+    ],
+    "answer": 1,
+    "category": "Literature",
+    "points": 3
+  },
+  {
+    "id": "3",
+    "text": "What is 2+2?",
+    "options": [
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "answer": 1,
+    "category": "Mathematics",
+    "points": 2
+  }
+]

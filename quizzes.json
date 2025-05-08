@@ -1,0 +1,13 @@
+[
+  {
+    "id": "1",
+    "title": "General Knowledge",
+    "questions": [
+      "1",
+      "2",
+      "3"
+    ],
+    "category": "Mixed",
+    "timeLimit": 10
+  }
+]

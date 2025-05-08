@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+</head>
+<body>
+    <h1>Quiz App</h1>
+
+    <!-- Register Form -->
+    <h2>Register</h2>
+    <form id="registerForm">
+        <input type="text" id="username" placeholder="Username" required><br>
+        <input type="email" id="email" placeholder="Email" required><br>
+        <input type="password" id="password" placeholder="Password" required><br>
+        <button type="submit">Register</button>
+    </form>
+
+    <!-- Login Form -->
+    <h2>Login</h2>
+    <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email" required><br>
+        <input type="password" id="loginPassword" placeholder="Password" required><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <!-- Add Quiz Form -->
+    <h2>Add Quiz</h2>
+    <form id="addQuizForm">
+        <input type="text" id="quizTitle" placeholder="Quiz Title" required><br>
+        <button type="submit">Add Quiz</button>
+    </form>
+
+    <!-- View Quiz Form -->
+    <h2>View Quiz</h2>
+    <form id="viewQuizForm">
+        <input type="text" id="quizId" placeholder="Quiz ID" required><br>
+        <button type="submit">View Quiz</button>
+    </form>
+
+    <h3>Quiz Questions</h3>
+    <div id="quizQuestions"></div>
+
+    <!-- Submit Quiz Form -->
+    <h2>Submit Quiz</h2>
+    <form id="submitQuizForm">
+        <input type="text" id="submitQuizId" placeholder="Quiz ID" required><br>
+        <input type="text" id="submitAnswers" placeholder="Comma separated answers" required><br>
+        <button type="submit">Submit Quiz</button>
+    </form>
+
+    <script>
+        const apiUrl = 'http://localhost:8056';
+
+        // Register
+        document.getElementById('registerForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const data = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+            };
+            const response = await fetch(apiUrl + '/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            alert(result.message);
+        });
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const data = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value,
+            };
+            const response = await fetch(apiUrl + '/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            alert(result.message);
+        });
+
+        // Add Quiz
+        document.getElementById('addQuizForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const data = {
+                title: document.getElementById('quizTitle').value,
+                hostedBy: "hostedByID"  // Replace with actual user ID
+            };
+            const response = await fetch(apiUrl + '/quiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            alert(result.message);
+        });
+
+        // View Quiz
+        document.getElementById('viewQuizForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const quizId = document.getElementById('quizId').value;
+            const response = await fetch(apiUrl + '/quiz/' + quizId);
+            const result = await response.json();
+            const questionsDiv = document.getElementById('quizQuestions');
+            questionsDiv.innerHTML = '';
+            result.questions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.innerHTML = `
+                    <p>Question ${index + 1}: ${question.questionText}</p>
+                    ${question.options.map((opt, i) => `<p><input type="radio" name="q${index}" value="${i}">${opt}</p>`).join('')}
+                `;
+                questionsDiv.appendChild(questionDiv);
+            });
+        });
+
+        // Submit Quiz
+        document.getElementById('submitQuizForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const quizId = document.getElementById('submitQuizId').value;
+            const answers = document.getElementById('submitAnswers').value.split(',').map(Number);
+            const data = {
+                quizId: quizId,
+                answers: answers
+            };
+            const response = await fetch(apiUrl + '/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            alert(`Your score is ${result.score} out of ${result.total}`);
+        });
+    </script>
+</body>
+</html>

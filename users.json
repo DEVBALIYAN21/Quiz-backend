@@ -1,0 +1,32 @@
+[
+  {
+    "id": "1",
+    "username": "admin",
+    "password": "admin123",
+    "email": "admin@example.com"
+  },
+  {
+    "id": "2",
+    "username": "user",
+    "password": "user123",
+    "email": "user@example.com"
+  },
+  {
+    "id": "a9275633-ce03-47a6-a1e4-efc659f90bed",
+    "username": "testuser",
+    "password": "password123",
+    "email": "test@example.com"
+  },
+  {
+    "id": "7402db66-5748-4f72-8b2c-21d5046b599f",
+    "username": "dev",
+    "password": "dev123",
+    "email": "devbaliyan202@gmail.com"
+  },
+  {
+    "id": "485080e5-cac9-436f-a1b9-58cd7c8fa5ed",
+    "username": "vartika",
+    "password": "vartika",
+    "email": "vartika@gmail.com"
+  }
+]
