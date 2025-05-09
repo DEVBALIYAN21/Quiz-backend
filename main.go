@@ -142,6 +142,10 @@ type UserQuizzesParams struct {
 	Limit int `form:"limit"`
 	Page  int `form:"page"`
 }
+type UserAttemptedQuizzesParams struct {
+	Limit int `form:"limit"`
+	Page  int `form:"page"`
+}
 
 type LeaderboardEntry struct {
 	UserID      primitive.ObjectID `json:"userId"`
@@ -916,7 +920,104 @@ func getLeaderboard(c *gin.Context) {
 
 	c.JSON(http.StatusOK, leaderboard)
 }
+func getUserAttemptedQuizzes(c *gin.Context) {
+	userID := c.MustGet("userId").(primitive.ObjectID)
 
+	var params UserAttemptedQuizzesParams
+	if err := c.ShouldBindQuery(&params); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Set default pagination values
+	if params.Limit == 0 {
+		params.Limit = 10
+	}
+	if params.Page == 0 {
+		params.Page = 1
+	}
+
+	// Fetch quiz results for the user
+	var results []QuizResult
+	cursor, err := resultCollection.Find(ctx,
+		bson.M{"userid": userID},
+		options.Find().
+			SetSort(bson.M{"submittedAt": -1}).
+			SetSkip(int64((params.Page-1)*params.Limit)).
+			SetLimit(int64(params.Limit)),
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch quiz results"})
+		return
+	}
+	if err = cursor.All(ctx, &results); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode quiz results"})
+		return
+	}
+
+	// Fetch quiz details for each result
+	quizDetailsList := make([]QuizDetails, 0, len(results))
+	for _, result := range results {
+		// Fetch quiz
+		var quiz Quiz
+		err = quizCollection.FindOne(ctx, bson.M{"_id": result.QuizID}).Decode(&quiz)
+		if err != nil {
+			log.Printf("Failed to fetch quiz %s: %v", result.QuizID.Hex(), err)
+			continue
+		}
+
+		// Fetch questions
+		var questions []Question
+		cursor, err := questionCollection.Find(ctx, bson.M{"quizid": quiz.ID})
+		if err != nil {
+			log.Printf("Failed to fetch questions for quiz %s: %v", quiz.ID.Hex(), err)
+			continue
+		}
+		if err = cursor.All(ctx, &questions); err != nil {
+			log.Printf("Failed to decode questions for quiz %s: %v", quiz.ID.Hex(), err)
+			continue
+		}
+
+		// Prepare student result (only the user's own result)
+		var user User
+		err = userCollection.FindOne(ctx, bson.M{"_id": userID}).Decode(&user)
+		if err != nil {
+			log.Printf("Failed to fetch user %s: %v", userID.Hex(), err)
+			continue
+		}
+		studentResult := StudentResult{
+			UserID:      user.ID,
+			Username:    user.Username,
+			Score:       result.Score,
+			TotalScore:  result.TotalScore,
+			Percentage:  result.Percentage,
+			SubmittedAt: result.SubmittedAt,
+		}
+
+		quizDetails := QuizDetails{
+			Quiz:           quiz,
+			Questions:      questions,
+			AttemptCount:   quiz.AttemptCount,
+			AverageScore:   quiz.AvgScore,
+			StudentResults: []StudentResult{studentResult}, // Only include the user's result
+		}
+		quizDetailsList = append(quizDetailsList, quizDetails)
+	}
+
+	// Count total attempted quizzes for pagination
+	total, err := resultCollection.CountDocuments(ctx, bson.M{"userId": userID})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count attempted quizzes"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"quizzes": quizDetailsList,
+		"total":   total,
+		"page":    params.Page,
+		"limit":   params.Limit,
+	})
+}
 func main() {
 	// Load environment variables
 	if err := godotenv.Load(); err != nil {
@@ -962,6 +1063,7 @@ func main() {
 	protected.POST("/quizzes", createQuiz)
 	protected.GET("/quizzes/:quizCode", getQuiz)
 	protected.GET("/quizzes/:quizCode/details", getQuizDetails)
+	protected.GET("/users/attempted-quizzes", getUserAttemptedQuizzes)
 	protected.GET("/users/quizzes", getUserQuizzes)
 	protected.POST("/quizzes/submit", submitQuiz)
 	protected.GET("/users/stats", getUserStats)
